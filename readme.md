@@ -21,7 +21,15 @@ No remote deployment has been performed.
 
 The local repository uses branch `main`. Initial implementation commit: `78f85aa` (`Build bilingual Bible study website with 25 lessons`). A fresh local Git clone was checked and its Docker image built successfully, including validation of all 25 lessons.
 
-A remote has not been configured or pushed yet; the destination is awaiting the user's choice. At handoff, GitHub CLI is authenticated as `Alex-Fung-GGL`, while the neighboring HCMC voting repository uses `git@github-paraselene:paraselene/voting.git`. Confirm the intended destination rather than creating the church repository under the corporate account by assumption. For `paraselene`, an empty repository URL or authentication for repository creation is needed. The local Git commit already contains everything needed for the production Docker build.
+The user-selected remote is [`paraselene/bible-study`](https://github.com/paraselene/bible-study). Local `origin` uses `git@github-paraselene:paraselene/bible-study.git`; publish branch `main` using direct Git over SSH.
+
+The `github-paraselene` SSH host alias is configured on this development Mac. On a production machine with an authorized GitHub SSH key, clone using the standard host:
+
+```sh
+rtk git clone git@github.com:paraselene/bible-study.git
+```
+
+Then follow the production setup below from the cloned directory. A machine with the same SSH alias may use the local `origin` URL instead. The repository contains everything needed for the production Docker build; source PDFs and local databases are intentionally excluded.
 
 ## Decisions to preserve in future sessions
 
