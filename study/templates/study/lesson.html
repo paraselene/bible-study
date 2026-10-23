@@ -1,0 +1,37 @@
+{% extends 'study/base.html' %}
+{% block title %}{{ title }} · {{ ui.brand }}{% endblock %}
+{% block content %}
+<div class="lesson-page" data-lesson="{{ lesson_id }}">
+  <div class="lesson-heading" id="top">
+    <a class="back-link" href="{% url 'library' %}">← {{ ui.library }}</a>
+    <p class="eyebrow">{{ ui.unit }} {{ unit }} <span aria-hidden="true">/</span> {{ ui.session }} {{ session }}</p>
+    <h1 lang="{{ title_lang }}">{{ title }}</h1>
+    <div class="guide-tabs" aria-label="{{ ui.contents }}"><a href="{% url 'lesson' lesson_id 'student' %}"{% if guide == 'student' %} aria-current="page"{% endif %}>{{ ui.student }}</a>{% if request.session.role == 'leader' %}<a href="{% url 'lesson' lesson_id 'leader' %}"{% if guide == 'leader' %} aria-current="page"{% endif %}>{{ ui.leader }}</a>{% endif %}</div>
+    {% if fallback %}<p class="notice">{{ ui.fallback }}</p>{% endif %}
+  </div>
+  <div class="reading-layout">
+    <aside class="section-nav"><details open><summary>{{ ui.contents }}</summary><nav aria-label="{{ ui.contents }}">{% for section in sections %}<a href="#{{ section.id }}">{{ section.title }}</a>{% endfor %}</nav></details></aside>
+    <div class="lesson-content">
+      <div class="answer-toolbar"><span id="save-status" role="status" aria-live="polite">{{ ui.saved }}</span><button id="clear-answers" class="text-button" type="button">{{ ui.clear }}</button></div>
+      <p class="privacy-note">{{ ui.privacy }}</p>
+      {% for section in sections %}
+      <section class="reading-section section-{{ section.id }}" id="{{ section.id }}" aria-labelledby="heading-{{ section.id }}">
+        <h2 id="heading-{{ section.id }}">{{ section.title }}</h2>
+        {% for block in section.blocks %}
+          {% if block.type == 'heading' %}<h3 lang="{{ block.text_lang }}">{{ block.text }}</h3>
+          {% elif block.type == 'reference' %}<p class="reference" lang="en">{{ block.text }}</p>
+          {% elif block.type == 'label' %}<h4>{{ block.text }}</h4>
+          {% elif block.type == 'question' %}<div class="question"><p class="question-text" lang="{{ block.text_lang }}">{{ block.text }}</p><label for="answer-{{ block.id }}">{{ ui.answer }}</label><textarea id="answer-{{ block.id }}" data-question="{{ block.id }}" rows="3" spellcheck="true"></textarea></div>
+          {% elif block.type == 'answer' %}<details class="leader-answer"><summary>{{ ui.leader_answer }}</summary><div lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</div></details>
+          {% elif block.type == 'scripture' %}<blockquote class="scripture" lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</blockquote>
+          {% else %}<p class="body-text" lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</p>{% endif %}
+        {% endfor %}
+      </section>
+      {% endfor %}
+      <a class="back-link" href="#top">↑ {{ ui.top }}</a>
+    </div>
+  </div>
+</div>
+<dialog id="clear-dialog" aria-labelledby="clear-title"><h2 id="clear-title">{{ ui.clear }}</h2><p>{{ ui.confirm_clear }}</p><form method="dialog"><button value="cancel" class="small-button">{{ ui.cancel }}</button><button value="clear" class="button danger">{{ ui.confirm }}</button></form></dialog>
+{{ ui|json_script:'study-labels' }}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'study/base.html' %}
+{% block content %}
+<div class="login-layout">
+  <div class="login-intro"><p class="eyebrow">THE GOSPEL PROJECT</p><h1>{{ ui.brand }}</h1><p>{{ ui.library_intro }}</p><div class="line-art" aria-hidden="true">✦</div></div>
+  <section class="login-card" aria-labelledby="login-title">
+    <p class="eyebrow">{{ ui.library }}</p><h2 id="login-title">{{ ui.login }}</h2><p>{{ ui.login_intro }}</p>
+    <form method="post">{% csrf_token %}
+      <label for="password">{{ ui.password }}</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" maxlength="200" required{% if error %} aria-invalid="true" aria-describedby="login-error"{% endif %} autofocus>
+      {% if error %}<p id="login-error" class="error" role="alert">{{ ui.invalid }}</p>{% endif %}
+      <button type="submit" class="button">{{ ui.login }} <span aria-hidden="true">→</span></button>
+    </form>
+  </section>
+</div>
+{% endblock %}

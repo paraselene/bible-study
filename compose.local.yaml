@@ -1,0 +1,14 @@
+# Independent local setup; does not use the production environment or network.
+services:
+  biblestudy-web:
+    build: .
+    environment:
+      DEBUG: "1"
+      DATABASE_PATH: /data/db.sqlite3
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      PUBLIC_URL: http://localhost:18001
+    ports:
+      - "127.0.0.1:18001:8000"
+    volumes:
+      - ./data/local-docker:/data
+    restart: unless-stopped

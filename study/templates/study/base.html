@@ -1,0 +1,29 @@
+{% load static %}<!doctype html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}{{ ui.brand }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'study/site.css' %}">
+  <script src="{% static 'study/site.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">{{ ui.skip }}</a>
+  <header class="site-header">
+    <a class="brand" href="{% url 'library' %}"><span class="brand-mark" aria-hidden="true">✦</span>{{ ui.brand }}</a>
+    <div class="header-actions">
+      <form method="get" class="language-form">
+        <label class="visually-hidden" for="language">{{ ui.language }}</label>
+        <select id="language" name="lang" data-auto-submit>
+          {% for code, name in languages.items %}<option value="{{ code }}"{% if code == lang %} selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="small-button">{{ ui.apply }}</button>
+      </form>
+      {% if request.session.role %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-button" type="submit">{{ ui.logout }}</button></form>{% endif %}
+    </div>
+  </header>
+  <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+  <footer class="site-footer">{{ ui.brand }} <span aria-hidden="true">·</span> {{ ui.library_intro }}</footer>
+</body>
+</html>

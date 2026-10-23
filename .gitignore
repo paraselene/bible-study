@@ -1,0 +1,10 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+data/
+staticfiles/
+tmp/
+.DS_Store
+source/
+lessons/assets/

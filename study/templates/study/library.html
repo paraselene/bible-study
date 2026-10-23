@@ -1,0 +1,23 @@
+{% extends 'study/base.html' %}
+{% block title %}{{ ui.library }} · {{ ui.brand }}{% endblock %}
+{% block content %}
+<div class="library">
+  <div class="library-heading"><div><p class="eyebrow">THE GOSPEL PROJECT</p><h1>{{ ui.library }}</h1><p class="lede">{{ ui.library_intro }}</p></div><span class="lesson-count">{{ lessons|length }} {{ ui.lessons_count }}</span></div>
+  {% if lang != 'en' %}<p class="notice">{{ ui.fallback }}</p>{% endif %}
+  {% regroup lessons by unit as units %}
+  {% for group in units %}
+  <section class="unit" aria-labelledby="unit-{{ group.grouper }}">
+    <h2 id="unit-{{ group.grouper }}"><span>{{ ui.unit }}</span> {{ group.grouper }}</h2>
+    <div class="lesson-grid">
+      {% for lesson in group.list %}
+      <article class="lesson-card">
+        <p class="eyebrow">{{ ui.session }} {{ lesson.session|stringformat:'02d' }}</p>
+        <h3{% if lesson.fallback %} lang="en"{% endif %}>{{ lesson.display_title }}</h3>
+        <div class="card-links"><a href="{% url 'lesson' lesson.id 'student' %}">{{ ui.student }} <span aria-hidden="true">↗</span></a>{% if request.session.role == 'leader' %}<a href="{% url 'lesson' lesson.id 'leader' %}">{{ ui.leader }} <span aria-hidden="true">↗</span></a>{% endif %}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

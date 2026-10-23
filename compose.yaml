@@ -1,0 +1,17 @@
+services:
+  biblestudy-web:
+    build: .
+    env_file: .env
+    environment:
+      DEBUG: "0"
+      DATABASE_PATH: /data/db.sqlite3
+    volumes:
+      - ./data/production:/data
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: wordpress_wordpress_net
+    external: true

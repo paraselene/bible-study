@@ -1,0 +1,399 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Approved Bible study lesson format (u23_s1.json)",
+  "type": "object",
+  "properties": {
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "main_point": {
+      "$ref": "#/$defs/text"
+    },
+    "christ_connection": {
+      "$ref": "#/$defs/text"
+    },
+    "scripture": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 3
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 3
+              },
+              "content": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "required": [
+              "title",
+              "reference",
+              "content"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "title",
+        "reference",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "before_you_teach": {
+      "type": "object",
+      "properties": {
+        "leader_only": {
+          "const": true
+        },
+        "content": {
+          "$ref": "#/$defs/text"
+        },
+        "commentary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "content": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "minLength": 3
+                    },
+                    "content": {
+                      "$ref": "#/$defs/text"
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "content"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "title",
+              "content"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "leader_only",
+        "content",
+        "commentary"
+      ],
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "leader_only": {
+          "const": true
+        },
+        "content": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "leader_only",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "theology_connection": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "content": {
+          "$ref": "#/$defs/text"
+        },
+        "prayer": {
+          "type": "object",
+          "properties": {
+            "leader_only": {
+              "const": true
+            },
+            "content": {
+              "$ref": "#/$defs/text"
+            }
+          },
+          "required": [
+            "leader_only",
+            "content"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "title",
+        "content",
+        "prayer"
+      ],
+      "additionalProperties": false
+    },
+    "kick_starter": {
+      "type": "object",
+      "properties": {
+        "leader_only": {
+          "const": true
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "question": {
+          "$ref": "#/$defs/text"
+        },
+        "content": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "leader_only",
+        "title"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "id",
+            "question"
+          ],
+          "not": {
+            "required": [
+              "content"
+            ]
+          }
+        },
+        {
+          "required": [
+            "content"
+          ],
+          "not": {
+            "required": [
+              "question"
+            ]
+          }
+        }
+      ]
+    },
+    "intro_activity": {
+      "type": "object",
+      "properties": {
+        "leader_only": {
+          "const": true
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "supplies": {
+          "$ref": "#/$defs/text"
+        },
+        "instructions": {
+          "$ref": "#/$defs/text"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          },
+          "minItems": 1
+        },
+        "content": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "leader_only",
+        "title",
+        "supplies",
+        "instructions",
+        "questions",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "cultural_connection": {
+      "$ref": "#/$defs/text"
+    },
+    "discussion": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/$defs/text"
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 3
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/answered_question"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "title",
+          "reference",
+          "questions"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "wrap_up": {
+      "$ref": "#/$defs/answered_question"
+    },
+    "devotions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/$defs/text"
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 3
+          },
+          "content": {
+            "$ref": "#/$defs/text"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/question"
+            },
+            "minItems": 1
+          },
+          "prayer": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "required": [
+          "title",
+          "reference",
+          "content",
+          "questions",
+          "prayer"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "title",
+    "main_point",
+    "christ_connection",
+    "scripture",
+    "before_you_teach",
+    "context",
+    "theology_connection",
+    "kick_starter",
+    "intro_activity",
+    "cultural_connection",
+    "discussion",
+    "wrap_up",
+    "devotions"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "text": {
+      "type": "object",
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1
+        },
+        "zh-Hant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "en",
+        "zh-Hant"
+      ],
+      "additionalProperties": false
+    },
+    "question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "question": {
+          "$ref": "#/$defs/text"
+        },
+        "answer": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "id",
+        "question"
+      ],
+      "additionalProperties": false
+    },
+    "answered_question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "question": {
+          "$ref": "#/$defs/text"
+        },
+        "answer": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "answer"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

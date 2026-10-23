@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bible Study PDF to JSON"
+  short_description: "Extract LG/DDG PDFs into approved bilingual JSON"
+  default_prompt: "Use $bible-study-pdf-to-json to extract these lesson PDFs into the approved bilingual lesson JSON format."
