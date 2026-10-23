@@ -17,6 +17,12 @@ The local Docker website is available at **http://localhost:18001** when the loc
 
 No remote deployment has been performed.
 
+## Git handoff
+
+The local repository uses branch `main`. Initial implementation commit: `78f85aa` (`Build bilingual Bible study website with 25 lessons`). A fresh local Git clone was checked and its Docker image built successfully, including validation of all 25 lessons.
+
+A remote has not been configured or pushed yet; the destination is awaiting the user's choice. At handoff, GitHub CLI is authenticated as `Alex-Fung-GGL`, while the neighboring HCMC voting repository uses `git@github-paraselene:paraselene/voting.git`. Confirm the intended destination rather than creating the church repository under the corporate account by assumption. For `paraselene`, an empty repository URL or authentication for repository creation is needed. The local Git commit already contains everything needed for the production Docker build.
+
 ## Decisions to preserve in future sessions
 
 The user approved [`lessons/u23_s1.json`](lessons/u23_s1.json) as the format reference. Its content was preserved unchanged when moved into `lessons/`. See [`JSON_FORMAT.md`](JSON_FORMAT.md) and [`lesson.schema.json`](lesson.schema.json).
