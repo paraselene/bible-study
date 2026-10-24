@@ -16,7 +16,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG o
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:18001" if DEBUG or BUILD_STATIC else "").rstrip("/")
 if not DEBUG and not BUILD_STATIC and (not ALLOWED_HOSTS[0] or urlparse(PUBLIC_URL).scheme != "https"):
     raise ImproperlyConfigured("Production requires ALLOWED_HOSTS and an HTTPS PUBLIC_URL.")
-INSTALLED_APPS = ["django.contrib.contenttypes", "django.contrib.sessions", "django.contrib.staticfiles", "study"]
+INSTALLED_APPS = ["django.contrib.sessions", "django.contrib.staticfiles", "study"]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
