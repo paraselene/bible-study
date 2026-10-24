@@ -172,6 +172,14 @@ class AccessTests(TestCase):
         self.assertEqual(self.client.get("/lessons/u23-s1/other/").status_code, 404)
         self.assertEqual(self.client.get("/lessons/u99-s1/student/").status_code, 404)
 
+    def test_google_fonts_are_loaded_and_allowed_by_csp(self):
+        response = self.client.get("/login/?lang=en-zh-Hans")
+        self.assertContains(response, 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400..800&amp;family=Noto+Sans+TC:wght@400..800&amp;display=block')
+        policy = response["Content-Security-Policy"]
+        self.assertIn("style-src 'self' https://fonts.googleapis.com;", policy)
+        self.assertIn("font-src https://fonts.gstatic.com;", policy)
+        self.assertIn("script-src 'self';", policy)
+
     def test_default_language_fallback_and_remembered_choice(self):
         self.login()
         response = self.client.get("/lessons/u23-s1/student/")
