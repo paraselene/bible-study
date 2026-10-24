@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{% static 'study/site.css' %}">
   <script src="{% static 'study/site.js' %}" defer></script>
 </head>
-<body>
+<body data-language="{{ lang }}">
   <a class="skip" href="#main">{{ ui.skip }}</a>
   <header class="site-header">
     <a class="brand" href="{% url 'library' %}"><span class="brand-mark" aria-hidden="true">✦</span>{{ ui.brand }}</a>

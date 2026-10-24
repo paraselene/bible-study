@@ -6,3 +6,5 @@
 
 .translation{display:block;margin-top:.35em}
 @media(max-width:760px){.site-header{flex-wrap:wrap}.language-form select{max-width:100%;min-width:0}.header-actions{max-width:100%}.language-form{min-width:0}.brand{white-space:normal}}
+
+body[data-language$="zh-Hans"],:lang(zh-Hans){font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
