@@ -1,11 +1,11 @@
 {% extends 'study/base.html' %}
-{% block title %}{{ title }} · {{ ui.brand }}{% endblock %}
+{% block title %}{{ title.text }}{% if title.secondary %} / {{ title.secondary }}{% endif %} · {{ ui.brand }}{% endblock %}
 {% block content %}
 <div class="lesson-page" data-lesson="{{ lesson_id }}">
   <div class="lesson-heading" id="top">
     <a class="back-link" href="{% url 'library' %}">← {{ ui.library }}</a>
     <p class="eyebrow">{{ ui.unit }} {{ unit }} <span aria-hidden="true">/</span> {{ ui.session }} {{ session }}</p>
-    <h1 lang="{{ title_lang }}">{{ title }}</h1>
+    <h1 lang="{{ title.text_lang }}">{% include "study/text.html" with text=title %}</h1>
     <div class="guide-tabs" aria-label="{{ ui.contents }}"><a href="{% url 'lesson' lesson_id 'student' %}"{% if guide == 'student' %} aria-current="page"{% endif %}>{{ ui.student }}</a>{% if request.session.role == 'leader' %}<a href="{% url 'lesson' lesson_id 'leader' %}"{% if guide == 'leader' %} aria-current="page"{% endif %}>{{ ui.leader }}</a>{% endif %}</div>
     {% if fallback %}<p class="notice">{{ ui.fallback }}</p>{% endif %}
   </div>
@@ -18,13 +18,13 @@
       <section class="reading-section section-{{ section.id }}" id="{{ section.id }}" aria-labelledby="heading-{{ section.id }}">
         <h2 id="heading-{{ section.id }}">{{ section.title }}</h2>
         {% for block in section.blocks %}
-          {% if block.type == 'heading' %}<h3 lang="{{ block.text_lang }}">{{ block.text }}</h3>
-          {% elif block.type == 'reference' %}<p class="reference" lang="{{ block.text_lang }}">{{ block.text }}</p>
-          {% elif block.type == 'label' %}<h4>{{ block.text }}</h4>
-          {% elif block.type == 'question' %}<div class="question"><p class="question-text" lang="{{ block.text_lang }}">{{ block.text }}</p><label for="answer-{{ block.id }}">{{ ui.answer }}</label><textarea id="answer-{{ block.id }}" data-question="{{ block.id }}" rows="3" spellcheck="true"></textarea></div>
-          {% elif block.type == 'answer' %}<details class="leader-answer"><summary>{{ ui.leader_answer }}</summary><div lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</div></details>
-          {% elif block.type == 'scripture' %}<blockquote class="scripture" lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</blockquote>
-          {% else %}<p class="body-text" lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</p>{% endif %}
+          {% if block.type == 'heading' %}<h3 lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</h3>
+          {% elif block.type == 'reference' %}<p class="reference" lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</p>
+          {% elif block.type == 'label' %}<h4>{% include "study/text.html" with text=block %}</h4>
+          {% elif block.type == 'question' %}<div class="question"><p class="question-text" lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</p><label for="answer-{{ block.id }}">{{ ui.answer }}</label><textarea id="answer-{{ block.id }}" data-question="{{ block.id }}" rows="3" spellcheck="true"></textarea></div>
+          {% elif block.type == 'answer' %}<details class="leader-answer"><summary>{{ ui.leader_answer }}</summary><div lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</div></details>
+          {% elif block.type == 'scripture' %}<blockquote class="scripture" lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</blockquote>
+          {% else %}<p class="body-text" lang="{{ block.text_lang }}">{% include "study/text.html" with text=block %}</p>{% endif %}
         {% endfor %}
       </section>
       {% endfor %}

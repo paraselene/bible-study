@@ -2,7 +2,10 @@ import re
 
 from opencc import OpenCC
 
-LANGUAGES = {"en": "English", "zh-Hant": "繁體中文", "zh-Hans": "简体中文"}
+LANGUAGES = {
+    "en": "English", "zh-Hant": "繁體中文", "zh-Hans": "简体中文",
+    "en-zh-Hant": "English / 繁體中文", "en-zh-Hans": "English / 简体中文",
+}
 SIMPLIFIED = OpenCC("t2s")
 BIBLE_BOOKS = {
     "Genesis": "創世記",
@@ -149,10 +152,26 @@ def translate(value, lang):
     return (SIMPLIFIED.convert(text) if lang == "zh-Hans" else text), False
 
 
+def display_text(value, lang):
+    bilingual = lang.startswith("en-zh-")
+    chinese = lang.removeprefix("en-")
+    text, missing = translate(value, chinese if bilingual else lang)
+    return {
+        "text": value["en"] if bilingual else text,
+        "text_lang": "en" if bilingual or missing else lang,
+        "secondary": text if bilingual and not missing else "",
+        "secondary_lang": chinese,
+        "fallback": missing,
+    }
+
+
 def labels(lang):
+    if lang.startswith("en-zh-"):
+        chinese = labels(lang.removeprefix("en-"))
+        return {key: f"{pair[0]} / {chinese[key]}" for key, pair in LABELS.items()}
     return {key: pair[0] if lang == "en" else SIMPLIFIED.convert(pair[1]) if lang == "zh-Hans" else pair[1] for key, pair in LABELS.items()}
 
 
 def context(request):
     lang = getattr(request, "study_language", "zh-Hant")
-    return {"lang": lang, "languages": LANGUAGES, "ui": labels(lang)}
+    return {"lang": lang, "html_lang": "en" if lang.startswith("en-") else lang, "languages": LANGUAGES, "ui": labels(lang)}

@@ -12,7 +12,7 @@
       {% for lesson in group.list %}
       <article class="lesson-card">
         <p class="eyebrow">{{ ui.session }} {{ lesson.session|stringformat:'02d' }}</p>
-        <h3{% if lesson.fallback %} lang="en"{% endif %}>{{ lesson.display_title }}</h3>
+        <h3 lang="{{ lesson.display_title.text_lang }}">{% include "study/text.html" with text=lesson.display_title %}</h3>
         <div class="card-links"><a href="{% url 'lesson' lesson.id 'student' %}">{{ ui.student }} <span aria-hidden="true">↗</span></a>{% if request.session.role == 'leader' %}<a href="{% url 'lesson' lesson.id 'leader' %}">{{ ui.leader }} <span aria-hidden="true">↗</span></a>{% endif %}</div>
       </article>
       {% endfor %}

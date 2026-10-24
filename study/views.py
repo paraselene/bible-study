@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .content import for_guide, load_lesson, lesson_library
-from .i18n import translate
+from .i18n import display_text
 from .presentation import present_sections
 
 
@@ -58,7 +58,7 @@ def logout(request):
 def library(request):
     lessons = lesson_library()
     for item in lessons:
-        item["display_title"], item["fallback"] = translate(item["title"], request.study_language)
+        item["display_title"] = display_text(item["title"], request.study_language)
     return render(request, "study/library.html", {"lessons": lessons})
 
 
@@ -69,6 +69,6 @@ def lesson(request, lesson_id, guide):
         return render(request, "study/denied.html", status=403)
     data = for_guide(load_lesson(lesson_id), guide)
     sections, fallback = present_sections(data, request.study_language)
-    title, title_fallback = translate(data["title"], request.study_language)
+    title = display_text(data["title"], request.study_language)
     unit, session = map(int, re.findall(r"\d+", lesson_id))
-    return render(request, "study/lesson.html", {"lesson_id": lesson_id, "unit": unit, "session": session, "title": title, "title_lang": "en" if title_fallback else request.study_language, "guide": guide, "sections": sections, "fallback": fallback or title_fallback})
+    return render(request, "study/lesson.html", {"lesson_id": lesson_id, "unit": unit, "session": session, "title": title, "guide": guide, "sections": sections, "fallback": fallback or title["fallback"]})

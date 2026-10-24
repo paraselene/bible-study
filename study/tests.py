@@ -10,7 +10,7 @@ from jsonschema import Draft202012Validator
 
 from scripts.validate_lessons import validate
 from .content import for_guide, lesson_library, load_lesson
-from .i18n import BIBLE_BOOKS, SIMPLIFIED, translate_reference
+from .i18n import BIBLE_BOOKS, SIMPLIFIED, display_text, translate_reference
 from .presentation import present_sections
 
 
@@ -69,6 +69,21 @@ class ContentTests(SimpleTestCase):
         self.assertEqual(student["discussion"][0]["questions"][0]["id"], "discussion-1")
         self.assertEqual(student["title"]["zh-Hant"], None)
         self.assertEqual(data, original)
+
+    def test_bilingual_text_keeps_languages_and_fallback_separate(self):
+        value = {"en": "God’s word", "zh-Hant": "神的話語"}
+        for lang, chinese in (("en-zh-Hant", "神的話語"), ("en-zh-Hans", "神的话语")):
+            with self.subTest(lang=lang):
+                text = display_text(value, lang)
+                self.assertEqual(text["text"], value["en"])
+                self.assertEqual(text["text_lang"], "en")
+                self.assertEqual(text["secondary"], chinese)
+                self.assertEqual(text["secondary_lang"], lang.removeprefix("en-"))
+                self.assertFalse(text["fallback"])
+                missing = display_text({"en": "English only", "zh-Hant": None}, lang)
+                self.assertEqual(missing["text"], "English only")
+                self.assertEqual(missing["secondary"], "")
+                self.assertTrue(missing["fallback"])
 
 
 class AccessTests(TestCase):
@@ -185,6 +200,44 @@ class AccessTests(TestCase):
                 response = self.client.get("/lessons/u23-s1/student/?lang=zh-Hans")
         self.assertContains(response, "学习神的话语")
         self.assertContains(response, "这是祂的应许。")
+
+    def test_bilingual_selection_renders_both_languages_and_is_remembered(self):
+        self.login("leader")
+        data = load_lesson("u23-s1")
+        data["title"]["zh-Hant"] = "學習神的話語"
+        data["main_point"] = {"en": "First line\nSecond line", "zh-Hant": "第一行\n這是神的話語"}
+        question = data["discussion"][0]["questions"][0]
+        question["question"]["zh-Hant"] = "你的學習是甚麼？"
+        question["answer"]["zh-Hant"] = '<script>alert("unsafe")</script>組長的話語'
+        with TemporaryDirectory() as directory:
+            Path(directory, "u23_s1.json").write_text(json.dumps(data, ensure_ascii=False))
+            with override_settings(LESSON_DIR=Path(directory)):
+                for lang in ("en-zh-Hant", "en-zh-Hans"):
+                    chinese = lang.removeprefix("en-")
+                    convert = SIMPLIFIED.convert if chinese == "zh-Hans" else lambda text: text
+                    for guide in ("student", "leader"):
+                        with self.subTest(lang=lang, guide=guide):
+                            response = self.client.get(f"/lessons/u23-s1/{guide}/?lang={lang}")
+                            self.assertContains(response, f'<option value="{lang}" selected>')
+                            self.assertContains(response, '<html lang="en">')
+                            self.assertContains(response, 'First line<br>Second line')
+                            self.assertContains(response, f'<span class="translation" lang="{chinese}">{convert("第一行")}<br>{convert("這是神的話語")}</span>', html=True)
+                            self.assertContains(response, convert("你的學習是甚麼？"))
+                            self.assertContains(response, f'Mark 2<span class="translation" lang="{chinese}">{convert("馬可福音 2")}</span>')
+                            self.assertContains(response, 'data-question="discussion-1"', count=1)
+                            self.assertNotContains(response, '<script>alert("unsafe")</script>')
+                            if guide == "leader":
+                                self.assertContains(response, "&lt;script&gt;")
+                                self.assertContains(response, convert("組長的話語"))
+                            else:
+                                self.assertNotContains(response, convert("組長的話語"))
+                            self.assertNotContains(response, 'lang="en-zh-')
+                    library = self.client.get("/")
+                    self.assertContains(library, data["title"]["en"])
+                    self.assertContains(library, convert("學習神的話語"))
+                    self.assertContains(library, f'<option value="{lang}" selected>')
+                    self.assertEqual(self.client.cookies["study_language"].value, lang)
+                    self.assertEqual(self.client.get("/lessons/u23-s1/leader/").context["lang"], lang)
 
     def test_html_content_is_escaped(self):
         self.login()
