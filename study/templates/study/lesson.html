@@ -19,7 +19,7 @@
         <h2 id="heading-{{ section.id }}">{{ section.title }}</h2>
         {% for block in section.blocks %}
           {% if block.type == 'heading' %}<h3 lang="{{ block.text_lang }}">{{ block.text }}</h3>
-          {% elif block.type == 'reference' %}<p class="reference" lang="en">{{ block.text }}</p>
+          {% elif block.type == 'reference' %}<p class="reference" lang="{{ block.text_lang }}">{{ block.text }}</p>
           {% elif block.type == 'label' %}<h4>{{ block.text }}</h4>
           {% elif block.type == 'question' %}<div class="question"><p class="question-text" lang="{{ block.text_lang }}">{{ block.text }}</p><label for="answer-{{ block.id }}">{{ ui.answer }}</label><textarea id="answer-{{ block.id }}" data-question="{{ block.id }}" rows="3" spellcheck="true"></textarea></div>
           {% elif block.type == 'answer' %}<details class="leader-answer"><summary>{{ ui.leader_answer }}</summary><div lang="{{ block.text_lang }}">{{ block.text|linebreaksbr }}</div></details>

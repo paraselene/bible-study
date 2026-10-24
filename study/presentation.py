@@ -1,4 +1,4 @@
-from .i18n import labels, translate
+from .i18n import labels, translate, translate_reference
 
 
 def present_sections(data, lang):
@@ -20,7 +20,7 @@ def present_sections(data, lang):
         if "title" in value:
             result.append(text_block(value["title"], "heading"))
         if "reference" in value:
-            result.append({"type": "reference", "text": value["reference"], "text_lang": "en"})
+            result.append({"type": "reference", "text": translate_reference(value["reference"], lang), "text_lang": lang})
         if "question" in value:
             result.append(text_block(value["question"], "question", id=value["id"]))
             if "answer" in value:

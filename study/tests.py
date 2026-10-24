@@ -10,6 +10,43 @@ from jsonschema import Draft202012Validator
 
 from scripts.validate_lessons import validate
 from .content import for_guide, lesson_library, load_lesson
+from .i18n import BIBLE_BOOKS, SIMPLIFIED, translate_reference
+from .presentation import present_sections
+
+
+class ReferenceTests(SimpleTestCase):
+    def test_all_66_books_in_each_language(self):
+        self.assertEqual(len(BIBLE_BOOKS), 66)
+        for english, chinese in BIBLE_BOOKS.items():
+            for name in (english, english.upper()):
+                with self.subTest(book=name):
+                    self.assertEqual(translate_reference(f"{name} 1:1-3", "en"), f"{name} 1:1-3")
+                    self.assertEqual(translate_reference(f"{name} 1:1-3", "zh-Hant"), f"{chinese} 1:1-3")
+                    self.assertEqual(translate_reference(f"{name} 1:1-3", "zh-Hans"), f"{SIMPLIFIED.convert(chinese)} 1:1-3")
+
+    def test_combined_references_aliases_and_boundaries(self):
+        for reference, expected in (
+            ("Matthew 3:13-17; John 1:29-34", "馬太福音 3:13-17; 約翰福音 1:29-34"),
+            ("1 JOHN 3:1-3; 2 John 1:1; 3 John 1:2", "約翰一書 3:1-3; 約翰二書 1:1; 約翰三書 1:2"),
+            ("ISAIAH 1:11-15; 6:1-8", "以賽亞書 1:11-15; 6:1-8"),
+            ("Mark 1; Luke 4–5", "馬可福音 1; 路加福音 4–5"),
+            ("Luke 6:21a; Philippians 4:5b", "路加福音 6:21a; 腓立比書 4:5b"),
+            ("PSALM 96; Song of Songs 2:1", "詩篇 96; 雅歌 2:1"),
+            ("Unknown 1:2; Bookmark 1; John explains", "Unknown 1:2; Bookmark 1; John explains"),
+            ("約翰福音 3:16", "約翰福音 3:16"),
+        ):
+            with self.subTest(reference=reference):
+                self.assertEqual(translate_reference(reference, "zh-Hant"), expected)
+
+    def test_every_lesson_reference_is_translated_for_both_guides(self):
+        for item in lesson_library():
+            for guide in ("student", "leader"):
+                sections, _ = present_sections(for_guide(load_lesson(item["id"]), guide), "zh-Hant")
+                for section in sections:
+                    for block in section["blocks"]:
+                        if block["type"] == "reference":
+                            with self.subTest(lesson=item["id"], guide=guide, reference=block["text"]):
+                                self.assertNotRegex(block["text"], r"\b[A-Za-z]")
 
 
 class ContentTests(SimpleTestCase):
@@ -128,6 +165,14 @@ class AccessTests(TestCase):
         self.client.get("/?lang=en")
         self.assertContains(self.client.get("/"), 'lang="en"')
         self.assertContains(self.client.get("/?lang=invalid"), 'lang="zh-Hant"')
+
+    def test_rendered_reference_uses_selected_language(self):
+        self.login("leader")
+        for guide in ("student", "leader"):
+            for lang, reference in (("en", "Mark 2"), ("zh-Hant", "馬可福音 2"), ("zh-Hans", "马可福音 2")):
+                with self.subTest(guide=guide, lang=lang):
+                    response = self.client.get(f"/lessons/u23-s1/{guide}/?lang={lang}")
+                    self.assertContains(response, f'<p class="reference" lang="{lang}">{reference}</p>', html=True)
 
     def test_simplified_chinese_is_generated_from_traditional(self):
         self.login()
