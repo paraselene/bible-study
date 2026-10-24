@@ -7,4 +7,5 @@ staticfiles/
 tmp/
 .DS_Store
 source/
+translation/
 lessons/assets/
