@@ -19,7 +19,6 @@
         <select id="language" name="lang" data-auto-submit>
           {% for code, name in languages.items %}<option value="{{ code }}"{% if code == lang %} selected{% endif %}>{{ name }}</option>{% endfor %}
         </select>
-        <button type="submit" class="small-button">{{ ui.apply }}</button>
       </form>
       {% if request.session.role %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-button" type="submit">{{ ui.logout }}</button></form>{% endif %}
     </div>

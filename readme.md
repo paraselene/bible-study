@@ -2,13 +2,13 @@
 
 ## Current state
 
-Updated 2026-10-24. The goal is a mobile-friendly Django website for reading the supplied Bible-study curriculum, with shared leader/student access and browser-local written responses.
+Updated 2026-10-24. The goal is a mobile-friendly Django website for reading the supplied Bible-study curriculum, with shared leader/disciple access and browser-local written responses.
 
 The website reads **25 canonical lesson JSONs from `lessons/`**, covering Units 20–25. Units 20, 21, 22, 23, and 25 have four sessions each; Unit 24 has five. Files are named `u20_s1.json`, `u21_s2.json`, etc. The library discovers them automatically. They are private server data, not public static assets.
 
 The local Docker website is available at **http://localhost:18001** when the local Compose service is running.
 
-- Password `student`: shared lesson content and questions.
+- Password `disciple`: shared lesson content and questions.
 - Password `leader`: both guides, including teaching notes and supplied reference answers.
 - English, 繁體中文, and 简体中文 interface labels; Traditional Chinese is the default and the selection is remembered.
 - Lesson text is currently English. Missing Chinese text displays English with a fallback notice. Simplified Chinese is generated from Traditional Chinese with OpenCC.

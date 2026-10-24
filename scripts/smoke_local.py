@@ -38,7 +38,7 @@ def post(opener, jar, path, values):
 def main():
     student, student_jar = client()
     get(student, "/login/")
-    library = post(student, student_jar, "/login/", {"password": "student"})
+    library = post(student, student_jar, "/login/", {"password": "disciple"})
     assert len(re.findall(r'class="lesson-card"', library)) == 25
     html = get(student, "/lessons/u23-s1/student/?lang=en")
     assert 'data-question="discussion-1"' in html and 'class="leader-answer"' not in html

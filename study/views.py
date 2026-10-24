@@ -18,7 +18,7 @@ def private(view):
     @wraps(view)
     @never_cache
     def wrapped(request, *args, **kwargs):
-        if request.session.get("role") not in ("leader", "student"):
+        if request.session.get("role") not in ("leader", "disciple"):
             return redirect("login")
         return view(request, *args, **kwargs)
     return wrapped
@@ -36,7 +36,7 @@ def login(request):
     error = False
     if request.method == "POST":
         password = request.POST.get("password", "")
-        role = "leader" if secrets.compare_digest(password.encode(), b"leader") else "student" if secrets.compare_digest(password.encode(), b"student") else None
+        role = "leader" if secrets.compare_digest(password.encode(), b"leader") else "disciple" if secrets.compare_digest(password.encode(), b"disciple") else None
         if role:
             request.session.flush()
             request.session["role"] = role

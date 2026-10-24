@@ -3,7 +3,7 @@
 ## Website
 
 - Build a mobile-friendly Django website following `../voting`: Gunicorn, WhiteNoise, SQLite sessions, and Docker Compose.
-- One password field: `leader` grants access to both guides; `student` grants access only to the disciple guide. No individual accounts.
+- One password field: `leader` grants access to both guides; `disciple` grants access only to the disciple guide. No individual accounts.
 - Provide a unit/session library and full scrolling lessons with section navigation.
 - Enforce access on the server. Never send leader-only content to student browsers or expose source PDFs and complete JSON as public static files.
 - Allow answers to study questions, saved automatically in the current browser. Key answers by lesson and stable question ID so language changes and shared questions preserve answers. Include save status and a confirmed clear-answers action.

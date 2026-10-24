@@ -87,12 +87,19 @@ class ContentTests(SimpleTestCase):
 
 
 class AccessTests(TestCase):
-    def login(self, role="student"):
+    def login(self, role="disciple"):
         return self.client.post("/login/", {"password": role})
 
     def test_anonymous_access_requires_login(self):
         for path in ("/", "/lessons/u23-s1/student/", "/lessons/u23-s1/leader/"):
             self.assertRedirects(self.client.get(path), "/login/")
+
+    def test_old_student_role_requires_login_again(self):
+        session = self.client.session
+        session["role"] = "student"
+        session.save()
+        self.assertRedirects(self.client.get("/"), "/login/")
+        self.assertRedirects(self.client.get("/lessons/u23-s1/leader/"), "/login/")
 
     def test_both_passwords_and_rotation(self):
         session = self.client.session
@@ -100,7 +107,7 @@ class AccessTests(TestCase):
         session.save()
         old_key = session.session_key
         self.assertRedirects(self.login(), "/")
-        self.assertEqual(self.client.session["role"], "student")
+        self.assertEqual(self.client.session["role"], "disciple")
         self.assertNotEqual(old_key, self.client.session.session_key)
         self.assertNotIn("old", self.client.session)
         student_key = self.client.session.session_key
@@ -110,6 +117,10 @@ class AccessTests(TestCase):
 
     def test_invalid_login(self):
         self.assertEqual(self.login("wrong").status_code, 400)
+        self.assertNotIn("role", self.client.session)
+
+    def test_old_student_password_is_rejected(self):
+        self.assertEqual(self.client.post("/login/", {"password": "student"}).status_code, 400)
         self.assertNotIn("role", self.client.session)
 
     def test_csrf_is_required_and_rotated(self):
