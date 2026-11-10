@@ -50,14 +50,23 @@ class ReferenceTests(SimpleTestCase):
 
 
 class ContentTests(SimpleTestCase):
-    def test_all_25_lessons_follow_approved_format(self):
+    def test_all_lessons_follow_approved_format(self):
         schema = json.loads((settings.BASE_DIR / "lesson.schema.json").read_text())
         validator = Draft202012Validator(schema)
         library = lesson_library()
-        self.assertEqual(len(library), 25)
+        self.assertTrue(library)
         for item in library:
             with self.subTest(lesson=item["id"]):
                 self.assertEqual(validate(load_lesson(item["id"]), validator, schema["required"]), [])
+
+    def test_library_discovers_new_lessons(self):
+        lesson = load_lesson("u23-s1")
+        with TemporaryDirectory() as directory, override_settings(LESSON_DIR=Path(directory)):
+            path = Path(directory) / "u30_s1.json"
+            path.write_text(json.dumps(lesson))
+            self.assertEqual([item["id"] for item in lesson_library()], ["u30-s1"])
+            (Path(directory) / "u31_s2.json").write_text(json.dumps(lesson))
+            self.assertEqual([item["id"] for item in lesson_library()], ["u30-s1", "u31-s2"])
 
     def test_projection_preserves_shared_content_and_translation_slots(self):
         data = load_lesson("u23-s1")

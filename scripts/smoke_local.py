@@ -39,7 +39,8 @@ def main():
     student, student_jar = client()
     get(student, "/login/")
     library = post(student, student_jar, "/login/", {"password": "disciple"})
-    assert len(re.findall(r'class="lesson-card"', library)) == 25
+    expected_count = sum(1 for path in (ROOT / "lessons").glob("u*_s*.json") if re.fullmatch(r"u\d+_s\d+", path.stem))
+    assert expected_count and len(re.findall(r'class="lesson-card"', library)) == expected_count
     html = get(student, "/lessons/u23-s1/student/?lang=en")
     assert 'data-question="discussion-1"' in html and 'class="leader-answer"' not in html
     assert "The home Jesus preached in" not in html
@@ -66,7 +67,7 @@ def main():
     assert 'class="lesson-card"' in get(student, "/")
     post(leader, leader_jar, "/logout/", {})
     assert 'name="password"' in get(leader, "/lessons/u23-s1/leader/")
-    print("Local Docker HTTP checks passed: 25 lessons, both passwords, student denial, private assets, WhiteNoise, POST logout, and SQLite session persistence after restart.")
+    print(f"Local Docker HTTP checks passed: {expected_count} lessons, both passwords, student denial, private assets, WhiteNoise, POST logout, and SQLite session persistence after restart.")
 
 
 if __name__ == "__main__":

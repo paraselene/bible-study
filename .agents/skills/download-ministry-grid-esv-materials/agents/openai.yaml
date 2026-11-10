@@ -1,0 +1,4 @@
+interface:
+  display_name: "Download Ministry Grid ESV Materials"
+  short_description: "Resume and batch-download all ESV LG/DDG PDFs"
+  default_prompt: "Use $download-ministry-grid-esv-materials to resume after the saved checkpoint and download every available ESV Leader Guide and Daily Discipleship Guide pair."

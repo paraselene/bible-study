@@ -2,24 +2,24 @@
 
 ## Current state
 
-Updated 2026-10-24. The goal is a mobile-friendly Django website for reading the supplied Bible-study curriculum, with shared leader/disciple access and browser-local written responses.
+Updated 2026-11-11. The goal is a mobile-friendly Django website for reading the supplied Bible-study curriculum, with shared leader/disciple access and browser-local written responses.
 
-The website reads **25 canonical lesson JSONs from `lessons/`**, covering Units 20–25. Units 20, 21, 22, 23, and 25 have four sessions each; Unit 24 has five. Files are named `u20_s1.json`, `u21_s2.json`, etc. The library discovers them automatically. They are private server data, not public static assets.
+The website reads canonical lesson JSONs from `lessons/`. As of this update, there are **29 lessons across Units 20–26**: four sessions in each unit except Unit 24, which has five. The library automatically discovers files named `u<unit>_s<session>.json`, such as `u26_s1.json`, and displays the current count. It has no fixed lesson limit. Lesson files are private server data, not public static assets.
 
 The local Docker website is available at **http://localhost:18001** when the local Compose service is running.
 
 - Password `disciple`: shared lesson content and questions.
 - Password `leader`: both guides, including teaching notes and supplied reference answers.
-- English, 繁體中文, and 简体中文 interface labels; Traditional Chinese is the default and the selection is remembered.
-- Lesson text is currently English. Missing Chinese text displays English with a fallback notice. Simplified Chinese is generated from Traditional Chinese with OpenCC.
+- English, 繁體中文, 简体中文, and bilingual English/Chinese reading modes; Traditional Chinese is the default and the selection is remembered. Bilingual modes show English first and Chinese second.
+- Lessons in Units 20–21 and U22 S1 have Traditional Chinese translations; other lessons currently have English text and empty translation slots. Missing Chinese text displays English with a fallback notice. Simplified Chinese is generated from Traditional Chinese with OpenCC.
 - Written responses save in the current browser, keyed by lesson and stable question ID. Language and guide changes preserve them. Clearing a lesson's responses requires confirmation.
 - Responses are not sent to the server or synchronized. They remain after logout and can be read by other people using the same browser. Clearing browser storage deletes them.
 
-No remote deployment has been performed.
+Deploy updates only when requested and authorized.
 
 ## Git handoff
 
-The local repository uses branch `main`. Initial implementation commit: `78f85aa` (`Build bilingual Bible study website with 25 lessons`). A fresh local Git clone was checked and its Docker image built successfully, including validation of all 25 lessons.
+The local repository uses branch `main`. The initial implementation commit was `78f85aa` (`Build bilingual Bible study website with 25 lessons`). At that time, a fresh local Git clone and Docker build were checked against those initial lessons.
 
 The user-selected remote is [`paraselene/bible-study`](https://github.com/paraselene/bible-study). Local `origin` uses `git@github-paraselene:paraselene/bible-study.git`; publish branch `main` using direct Git over SSH.
 
@@ -49,18 +49,24 @@ The skill is **repo-only** at [`.agents/skills/bible-study-pdf-to-json/SKILL.md`
 
 The workflow uses Luna subagents to extract and prepare JSON, followed by source and structure checks. The skill includes the approved example, schema, and a fallback validator. The user explicitly declined skill evaluation; do not run skill evaluations unless requested.
 
-The current local source set is 50 paired LG/DDG PDFs in `source/`. Raw PDFs and rendered review images are ignored by Git and excluded from the production Docker image; a production clone needs the checked JSONs, not these working files. Units 20–21 have extractable PDF text; Units 22–25 require OCR and visual review. Extract the eight-page session sections only:
+The local `source/` folder contains paired LG/DDG PDFs, including Unit 27 guides that have not yet been converted into website lessons. Raw PDFs and rendered review images are ignored by Git and excluded from the production Docker image; a production clone needs the checked JSONs, not these working files. Use native PDF text when readable and OCR with visual review when it is not. Verify the lesson section in every source; known page ranges include:
 
 | Source | Selected PDF pages |
 | --- | --- |
 | U25 S1 LG | 8–15 |
 | U25 S1 DDG | 6–13 |
 | U24 S5 LG and DDG | 1–8; ignore the extra end matter |
-| All other supplied PDFs | 1–8 |
+| Other lessons processed through U26 | 1–8 |
 
-Extraction drafts and review artifacts are under ignored `tmp/`; superseded block-dictionary JSONs are in `tmp/legacy-extraction/`. They are not website input. Rendered source-page images in `lessons/assets/` are review artifacts, not routed or included in the Docker image. Neither the source PDFs nor full lesson JSONs are publicly downloadable through the app.
+Keep extraction drafts and review artifacts in temporary storage outside `lessons/`; older drafts may be under ignored `tmp/`. They are not website input. Rendered source-page images in `lessons/assets/` are review artifacts, not routed or included in the Docker image. Neither the source PDFs nor full lesson JSONs are publicly downloadable through the app.
 
 `scripts/extract_lessons.py` is a legacy OCR staging helper, not a canonical lesson converter. Prepare final files through the repo-local skill and approved schema.
+
+### Add a lesson
+
+1. Prepare the matching LG and DDG sources using `$bible-study-pdf-to-json`, review the transcription against the source pages, and preserve any existing translations and question IDs.
+2. Place the validated file at `lessons/u<unit>_s<session>.json`, then run `rtk proxy .venv/bin/python scripts/validate_lessons.py` and the Django tests below. The library discovers the file without a code or configuration change.
+3. For the local Docker site, rebuild with the command below so the image includes the new file. Publish or deploy only when requested.
 
 ## Start locally with Docker
 
@@ -114,7 +120,7 @@ For HTTP checks against the running local Docker app:
 rtk proxy .venv/bin/python scripts/smoke_local.py
 ```
 
-That smoke check deliberately restarts the local container to verify that both authenticated sessions survive. It does not touch production.
+That smoke check compares the number of displayed lessons with the matching JSON files in this checkout, then deliberately restarts the local container to verify that both authenticated sessions survive. Rebuild the local image first after adding lessons; the check does not touch production.
 
 ## Production setup, when deployment is requested
 
@@ -140,8 +146,8 @@ The current lesson JSON contains text rather than instructional image fields; th
 
 ## Verification and remaining limits
 
-Completed: all 25 lessons pass schema/content-structure checks; source commentary reference grouping was checked; the approved U23 S1 example stayed unchanged. Fifteen Django tests cover permissions across every student lesson, both passwords, session rotation, CSRF, POST logout, fallback/conversion, escaped content, and private file paths. Validator tests and standalone answer-storage checks pass. Local Docker build/startup, WhiteNoise, HTTP access controls, secure production settings, and session persistence after a restart passed.
+The lesson validator checks every canonical file. Django tests cover permissions across every disciple lesson, both passwords, session rotation, CSRF, POST logout, fallback/conversion, escaped content, and private file paths. Validator tests and standalone answer-storage checks are available. Local Docker build/startup, WhiteNoise, HTTP access controls, secure production settings, and session persistence after a restart were checked previously; rerun the local smoke check after rebuilding to verify the current image.
 
-**Real browser/mobile layout and keyboard QA remain unverified.** Browser preview was denied by browser security policy, and no alternate browser automation was attempted. The JavaScript checks cover storage logic in isolation, not a real browser. No Chinese lesson translation, account management, response synchronization, content editor, or remote deployment was included.
+**Real browser/mobile layout and keyboard QA remain unverified.** The JavaScript checks cover storage logic in isolation, not a real browser. Chinese lesson translation is incomplete. Individual accounts, response synchronization, and a content editor are not included.
 
 Shared passwords are intentionally simple and shareable; anyone who knows `leader` can read leader material. JSON validation verifies structure and consistency, not the correctness of every OCR word. Use the original PDFs for any future text corrections.

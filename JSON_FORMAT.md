@@ -11,7 +11,7 @@
 - Questions contain a stable `id` and `question`; attach the supplied leader response as `answer`. Store shared LG/DDG text once. Keep leader-only teaching sections marked `leader_only`.
 - Keep the number of passages, commentary entries, questions, and daily readings appropriate to the actual lesson. A kickoff fact uses `content` instead of inventing a question.
 - Omit printed page numbers, repeated unit/session headers, running footers, OCR/layout metadata, block dictionaries, guide-reference maps, and approval metadata from lesson JSON.
-- Extract the standard eight-page lesson sections only. U24 S5 uses pages 1–8 in both guides; U25 S1 uses LG pages 8–15 and DDG pages 6–13. Other supplied lessons use pages 1–8.
+- Extract the lesson sections only and verify their page ranges in each source. U24 S5 uses pages 1–8 in both guides; U25 S1 uses LG pages 8–15 and DDG pages 6–13. Other lessons processed through U26 use pages 1–8.
 
 Changes to lesson wording must preserve question IDs and existing translations.
 
