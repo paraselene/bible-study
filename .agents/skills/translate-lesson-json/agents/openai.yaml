@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate Lesson JSON"
+  short_description: "Translate and review lessons in Traditional Chinese"
+  default_prompt: "Use $translate-lesson-json to translate the selected lesson JSON files into Traditional Chinese and independently review every English/Chinese pair."
