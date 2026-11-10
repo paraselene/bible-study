@@ -7,6 +7,8 @@ description: Translate selected existing BibleStudy lesson JSON files into Tradi
 
 Run from the repository root. Process only the files or batch requested; ask for lesson selection if unspecified. Creating or updating this skill does not authorize translating production lessons, committing, or deploying. Use the existing project environment; add no dependencies or translation service.
 
+The main agent only coordinates through messages; it must not prepare, translate, review, verify, or save lesson content itself. Delegate those tasks to agents and pass results between them. Spawn separate translator and reviewer agents with `model: "gpt-6.1-terra"`, `reasoning_effort: "high"`, and `fork_turns: "none"`. Give each a complete explicit handoff, including its task, requested paths, this skill, relevant project rules and artifacts, and constraints; neither inherits the conversation. The reviewer must be independent of the translator. If the required agents are unavailable or cannot complete their work, stop without saving and report the limitation.
+
 ## Prepare
 
 Read each full lesson, `JSON_FORMAT.md`, `lesson.schema.json`, and the approved `lessons/u23_s1.json` example. Keep an untouched original snapshot and a working copy in a temporary directory, with a mapping back to each requested path. Inventory every bilingual field by JSON path, using `walk` from `scripts/validate_lessons.py` if helpful.
