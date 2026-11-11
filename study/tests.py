@@ -76,7 +76,7 @@ class ContentTests(SimpleTestCase):
         self.assertNotIn("prayer", student["theology_connection"])
         self.assertNotIn("answer", student["wrap_up"])
         self.assertEqual(student["discussion"][0]["questions"][0]["id"], "discussion-1")
-        self.assertEqual(student["title"]["zh-Hant"], None)
+        self.assertEqual(student["title"], original["title"])
         self.assertEqual(data, original)
 
     def test_bilingual_text_keeps_languages_and_fallback_separate(self):
@@ -202,12 +202,25 @@ class AccessTests(TestCase):
 
     def test_default_language_fallback_and_remembered_choice(self):
         self.login()
-        response = self.client.get("/lessons/u23-s1/student/")
+        data = load_lesson("u23-s1")
+        data["main_point"]["zh-Hant"] = None
+        with TemporaryDirectory() as directory, override_settings(LESSON_DIR=Path(directory)):
+            Path(directory, "u23_s1.json").write_text(json.dumps(data))
+            response = self.client.get("/lessons/u23-s1/student/")
         self.assertContains(response, 'lang="zh-Hant"')
         self.assertContains(response, "本課中文翻譯尚未提供")
         self.client.get("/?lang=en")
         self.assertContains(self.client.get("/"), 'lang="en"')
         self.assertContains(self.client.get("/?lang=invalid"), 'lang="zh-Hant"')
+
+    def test_translated_library_and_lessons_omit_fallback_notice(self):
+        self.login("leader")
+        for lang in ("zh-Hant", "zh-Hans", "en-zh-Hant", "en-zh-Hans"):
+            for path in ("/", "/lessons/u27-s2/student/", "/lessons/u27-s2/leader/"):
+                with self.subTest(lang=lang, path=path):
+                    response = self.client.get(path, {"lang": lang})
+                    self.assertEqual(response.status_code, 200)
+                    self.assertNotContains(response, '<p class="notice">')
 
     def test_rendered_reference_uses_selected_language(self):
         self.login("leader")
